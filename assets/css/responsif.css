@@ -1,0 +1,195 @@
+/* ============================================
+   RESPONSIVE CSS - WALINI
+   Tambahkan ke semua halaman yang sudah ada
+   ============================================ */
+
+/* Pastikan body tidak overflow */
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
+/* Semua gambar responsive */
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Tabel bisa scroll horizontal di mobile */
+table {
+    max-width: 100% !important;
+}
+
+.table-container, .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Form input tidak keluar layar */
+input, select, textarea {
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Tombol mudah ditekan di mobile */
+button, .btn, a.btn {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* ============================================
+   MOBILE: Layar < 768px
+   ============================================ */
+@media (max-width: 768px) {
+    
+    /* Sidebar jadi hidden & bisa di-toggle */
+    .sidebar {
+        position: fixed !important;
+        top: 56px !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 260px !important;
+        z-index: 1000 !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2) !important;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0) !important;
+    }
+    
+    /* Main content full width */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 15px !important;
+    }
+    
+    /* Topbar geser untuk hamburger */
+    .topbar {
+        padding-left: 60px !important;
+    }
+    
+    /* Stats grid jadi 1 kolom */
+    .stats-grid, .stats-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    /* Card booking/destinasi 1 kolom */
+    .destinasi-grid, .booking-list {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Form row jadi 1 kolom */
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Page header stack */
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 15px !important;
+    }
+    
+    .page-header h2 {
+        font-size: 18px !important;
+    }
+    
+    /* Search box full width */
+    .search-box {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Booking body stack */
+    .booking-body {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Action buttons full width */
+    .booking-actions, .action-buttons {
+        flex-direction: column !important;
+    }
+    
+    .booking-actions .btn, 
+    .action-buttons .btn,
+    .booking-actions button,
+    .action-buttons button {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+    
+    /* Font input lebih besar (tidak zoom di iPhone) */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Card padding lebih kecil */
+    .card-box, .booking-card, .validation-card, .profile-card {
+        padding: 15px !important;
+    }
+    
+    /* Stat value lebih kecil */
+    .stat-value {
+        font-size: 22px !important;
+    }
+}
+
+/* ============================================
+   HP KECIL: < 375px
+   ============================================ */
+@media (max-width: 374px) {
+    .main-content {
+        padding: 10px !important;
+    }
+    
+    .stat-value {
+        font-size: 18px !important;
+    }
+    
+    .page-header h2 {
+        font-size: 16px !important;
+    }
+}
+
+/* ============================================
+   TOMBOL HAMBURGER (tambahkan manual di HTML)
+   ============================================ */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 8px;
+    left: 10px;
+    z-index: 1001;
+    background: #198754;
+    color: white;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 22px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: flex !important;
+    }
+}
+
+.overlay-menu {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+}
+
+.overlay-menu.active {
+    display: block !important;
+}

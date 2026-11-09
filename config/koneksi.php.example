@@ -1,0 +1,21 @@
+<?php
+// CONTOH KONFIGURASI DATABASE
+// Salin file ini menjadi koneksi.php dan sesuaikan dengan setting Anda
+
+$host = "127.0.0.1";        // Host database
+$db   = "booking_wisata_walini";  // Nama database
+$user = "root";             // Username database
+$pass = "";                 // Password database (kosongkan jika default XAMPP)
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    error_log("Database connection error: " . $e->getMessage());
+    die("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>

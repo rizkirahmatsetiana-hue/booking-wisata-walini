@@ -1,0 +1,33 @@
+# ============================================
+# .gitignore untuk Booking Wisata Walini
+# File/folder ini TIDAK akan di-upload ke GitHub
+# ============================================
+
+# Konfigurasi database (BERISI PASSWORD!)
+config/koneksi.php
+.env
+
+# Bukti pembayaran customer (DATA PRIBADI!)
+assets/img/bukti/
+uploads/
+
+# Gambar fasilitas (terlalu besar)
+assets/img/fasilitas/
+
+# File log
+*.log
+logs/
+
+# File sistem Windows
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Folder vendor/composer (jika ada)
+vendor/
+composer.lock
+
+# File temporary
+*.tmp
+*.bak
+*.swp
