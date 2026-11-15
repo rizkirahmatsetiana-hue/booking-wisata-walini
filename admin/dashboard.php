@@ -106,7 +106,7 @@ $destinasi_populer = $stmt->fetchAll();
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background: #f0f2f5; 
+            background: #f0f5f2; 
             font-family: 'Segoe UI', sans-serif; 
         }
         

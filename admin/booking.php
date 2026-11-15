@@ -120,7 +120,7 @@ $rejected = count(array_filter($bookings, fn($b) => $b['status'] === 'rejected')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f1f0f5; font-family: 'Segoe UI', sans-serif; }
         
         .sidebar {
             width: 240px;

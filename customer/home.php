@@ -417,7 +417,7 @@ try {
                         <p><?= htmlspecialchars($d['deskripsi'] ?? '') ?></p>
                         
                         <div class="harga">
-                            💰 Mulai Rp. <?= number_format($d['harga_tiket'], 0, ',', '.') ?>
+                             Mulai Rp. <?= number_format($d['harga_tiket'], 0, ',', '.') ?>
                         </div>
                         
                         <?php if ($stok_tiket > 0): ?>
@@ -449,7 +449,7 @@ try {
         <div class="info-box">
             <div class="info-item">
                 <i class="bi bi-clock"></i>
-                <span>Buka pukul 09.00 sampai pukul 17.00</span>
+                <span>Buka 24 jam</span>
             </div>
             <div class="info-item">
                 <i class="bi bi-geo-alt"></i>
