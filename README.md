@@ -29,3 +29,22 @@ Sistem informasi berbasis web untuk pemesanan tiket wisata Walini, Rancabali. Me
 - **Server:** Apache (XAMPP)
 - **Tools:** VS Code, Git, GitHub
 
+
+LINK HOSTING (LIVE DEMO):
+https://walini-booking.rf.gd/custemer/login.php
+https://walini-booking.rf.gd/kasir/login.php
+https://walini-booking.rf.gd/admin/login.php
+
+ AKUN DEMO:
+- Admin   : admin@walini.com / admin123
+- Kasir   : kasir@walini.com / kasir123
+- Customer: rizkirahmatsetiana@gmail.com / rizki123
+
+
+
+PEMBAGIAN TUGAS:
+- Frontend (Naufal) : Tampilan, CSS, JavaScript, Responsive
+- Backend (Rizki)   : Database, PHP, Logika Bisnis, Keamanan
+
+
+
