@@ -27,6 +27,20 @@ try {
 }
 $total_destinasi = count($destinasi_list);
 ?>
+// Ambil rating stats untuk semua destinasi
+$stmt_stats = $pdo->query("
+    SELECT 
+        d.id_destinasi,
+        COALESCE(AVG(u.rating), 0) as avg_rating,
+        COUNT(u.id_ulasan) as total_ulasan
+    FROM destinasi d
+    LEFT JOIN ulasan u ON d.id_destinasi = u.id_destinasi
+    GROUP BY d.id_destinasi
+");
+$rating_stats = [];
+foreach ($stmt_stats->fetchAll() as $r) {
+    $rating_stats[$r['id_destinasi']] = $r;
+}
 <!DOCTYPE html>
 <html lang="id">
 <head>
