@@ -370,6 +370,7 @@ try {
         <a href="destinasi.php"><i class="bi bi-geo-alt-fill"></i> Destinasi</a>
         <a href="riwayat.php"><i class="bi bi-receipt"></i> Pesanan</a>
         <a href="profile.php"><i class="bi bi-person-fill"></i> Profil</a>
+        <a href="ulasan.php"><i class="bi bi-star-fill"></i> Ulasan</a>
         <a href="../api/proses_logout.php" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
