@@ -6,19 +6,25 @@ cek_login('pelanggan');
 $user = walini_get_user();
 
 // ==========================================
-// LOGIKA PENCARIAN DESTINASI
+// LOGIKA PENCARIAN + SORTING + RATING (SKKNI 4 & 5)
 // ==========================================
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$sort   = isset($_GET['sort']) ? $_GET['sort'] : 'terbaru';
+
+// Query mengambil destinasi + rata2 rating (AVG) + jumlah ulasan (COUNT)
+$select = "d.*, COALESCE(AVG(u.rating), 0) as avg_rating, COUNT(u.id_ulasan) as total_ulasan";
+$from   = "FROM destinasi d LEFT JOIN ulasan u ON d.id_destinasi = u.id_destinasi";
+$group  = "GROUP BY d.id_destinasi";
+$order  = ($sort === 'rating_tertinggi') ? "ORDER BY avg_rating DESC" : "ORDER BY d.id_destinasi ASC";
 
 try {
     if (!empty($search)) {
-        // Jika ada kata kunci, cari berdasarkan nama atau deskripsi
-        $stmt = $pdo->prepare("SELECT * FROM destinasi WHERE nama_destinasi LIKE ? OR deskripsi LIKE ? ORDER BY id_destinasi ASC");
+        $where = "WHERE d.nama_destinasi LIKE ? OR d.deskripsi LIKE ?";
+        $stmt = $pdo->prepare("SELECT $select $from $where $group $order");
         $keyword = '%' . $search . '%';
         $stmt->execute([$keyword, $keyword]);
     } else {
-        // Jika tidak ada kata kunci, tampilkan semua
-        $stmt = $pdo->query("SELECT * FROM destinasi ORDER BY id_destinasi ASC");
+        $stmt = $pdo->query("SELECT $select $from $group $order");
     }
     $destinasi_list = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -27,20 +33,6 @@ try {
 }
 $total_destinasi = count($destinasi_list);
 ?>
-// Ambil rating stats untuk semua destinasi
-$stmt_stats = $pdo->query("
-    SELECT 
-        d.id_destinasi,
-        COALESCE(AVG(u.rating), 0) as avg_rating,
-        COUNT(u.id_ulasan) as total_ulasan
-    FROM destinasi d
-    LEFT JOIN ulasan u ON d.id_destinasi = u.id_destinasi
-    GROUP BY d.id_destinasi
-");
-$rating_stats = [];
-foreach ($stmt_stats->fetchAll() as $r) {
-    $rating_stats[$r['id_destinasi']] = $r;
-}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -133,7 +125,7 @@ foreach ($stmt_stats->fetchAll() as $r) {
             background: white;
             padding: 20px 25px;
             border-radius: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
@@ -142,8 +134,28 @@ foreach ($stmt_stats->fetchAll() as $r) {
         .page-header h2 { color: #333; font-size: 22px; display: flex; align-items: center; gap: 10px; }
         .badge-count { background: #e7f3ff; color: #0d6efd; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
         
+        /* SKKNI 5: Bar Pengurutan */
+        .sort-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .sort-bar label { font-size: 14px; color: #666; font-weight: 600; }
+        .sort-bar select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            background: white;
+        }
+        .sort-bar select:focus { border-color: #198754; }
+        
         .destinasi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .destinasi-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .destinasi-card { position: relative; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .destinasi-card:hover { transform: translateY(-3px); }
         .destinasi-card img { width: 100%; height: 200px; object-fit: cover; }
         .destinasi-card .card-body { padding: 15px; }
@@ -151,9 +163,24 @@ foreach ($stmt_stats->fetchAll() as $r) {
         .destinasi-card p { font-size: 12px; color: #666; margin-bottom: 10px; }
         .destinasi-card .harga { color: #198754; font-weight: bold; font-size: 14px; }
         
-        /* Tampilan Khusus Saat Tidak Ditemukan */
+        /* SKKNI 5: Badge Rating */
+        .badge-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 5;
+        }
+        .badge-rating.has-rating { background: #ffc107; color: #333; }
+        .badge-rating.no-rating  { background: #e2e8f0; color: #64748b; }
+        .badge-rating .badge-jml { font-size: 11px; font-weight: normal; color: #555; }
+        
         .empty-state {
-            grid-column: 1 / -1; /* Memaksa memenuhi seluruh lebar grid */
+            grid-column: 1 / -1;
             text-align: center;
             padding: 60px 20px;
             background: white;
@@ -214,6 +241,15 @@ foreach ($stmt_stats->fetchAll() as $r) {
             <span class="badge-count"><?= $total_destinasi ?> Destinasi Tersedia</span>
         </div>
 
+        <!-- SKKNI 5: Dropdown Pengurutan -->
+        <div class="sort-bar">
+            <label><i class="bi bi-sort-down"></i> Urutkan:</label>
+            <select onchange="window.location.href='?sort=' + this.value + (window.location.href.includes('search=') ? '&search=<?= urlencode($search) ?>' : '')">
+                <option value="terbaru" <?= $sort === 'terbaru' ? 'selected' : '' ?>>Terbaru</option>
+                <option value="rating_tertinggi" <?= $sort === 'rating_tertinggi' ? 'selected' : '' ?>>⭐ Rating Tertinggi</option>
+            </select>
+        </div>
+
         <div class="destinasi-grid">
             <?php if (!empty($destinasi_list)): ?>
                 <?php foreach ($destinasi_list as $d): 
@@ -224,6 +260,16 @@ foreach ($stmt_stats->fetchAll() as $r) {
                 ?>
                 <div class="destinasi-card">
                     <img src="../assets/img/<?= htmlspecialchars($d['gambar'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($d['nama_destinasi']) ?>">
+                    
+                    <!-- SKKNI 5: Badge Rating Dinamis -->
+                    <div class="badge-rating <?= ($d['total_ulasan'] > 0) ? 'has-rating' : 'no-rating' ?>">
+                        <?php if ($d['total_ulasan'] > 0): ?>
+                            ⭐ <?= number_format($d['avg_rating'], 1) ?> <span class="badge-jml">(<?= $d['total_ulasan'] ?>)</span>
+                        <?php else: ?>
+                            Belum ada rating
+                        <?php endif; ?>
+                    </div>
+
                     <div class="card-body">
                         <h3><?= htmlspecialchars($d['nama_destinasi']) ?></h3>
                         <p><?= htmlspecialchars(substr($d['deskripsi'] ?? '', 0, 50)) ?>...</p>
@@ -235,29 +281,28 @@ foreach ($stmt_stats->fetchAll() as $r) {
                         <?php else: ?>
                             <button disabled style="margin-top: 10px; width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: not-allowed;">✗ Tiket Habis</button>
                         <?php endif; ?>
-                      <?php 
-// Cek apakah destinasi ini punya fasilitas
-try {
-    $stmt_cek = $pdo->prepare("SELECT COUNT(*) FROM fasilitas WHERE id_destinasi = ?");
-    $stmt_cek->execute([$d['id_destinasi']]);
-    $ada_fasilitas = (int)$stmt_cek->fetchColumn();
-} catch (PDOException $e) {
-    $ada_fasilitas = 0;
-}
+                        <?php 
+                        // Cek apakah destinasi ini punya fasilitas
+                        try {
+                            $stmt_cek = $pdo->prepare("SELECT COUNT(*) FROM fasilitas WHERE id_destinasi = ?");
+                            $stmt_cek->execute([$d['id_destinasi']]);
+                            $ada_fasilitas = (int)$stmt_cek->fetchColumn();
+                        } catch (PDOException $e) {
+                            $ada_fasilitas = 0;
+                        }
 
-// Tombol hanya muncul jika ada fasilitas
-if ($ada_fasilitas > 0): 
-?>
-<a href="fasilitas.php?id=<?= $d['id_destinasi'] ?>" style="margin-top: 8px; display: block; text-align: center; text-decoration: none; padding: 8px; background: #0d6efd; color: white; border-radius: 8px; font-weight: bold; font-size: 13px;">
-    <i class="bi bi-stars"></i> Lihat Fasilitas
-</a>
-<?php endif; ?>
+                        // Tombol hanya muncul jika ada fasilitas
+                        if ($ada_fasilitas > 0): 
+                        ?>
+                        <a href="fasilitas.php?id=<?= $d['id_destinasi'] ?>" style="margin-top: 8px; display: block; text-align: center; text-decoration: none; padding: 8px; background: #0d6efd; color: white; border-radius: 8px; font-weight: bold; font-size: 13px;">
+                            <i class="bi bi-stars"></i> Lihat Fasilitas
+                        </a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
                 
             <?php else: ?>
-                <!-- TAMPILAN KHUSUS SAAT DESTINASI TIDAK DITEMUKAN -->
                 <div class="empty-state">
                     <i class="bi bi-emoji-frown" style="font-size: 64px; color: #cbd5e1;"></i>
                     <h3 style="color: #475569; margin-top: 20px; font-size: 20px;">Destinasi Tidak Ditemukan</h3>
@@ -297,7 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Fitur Tambahan: Jika user menghapus teks di search box, otomatis reload ke semua destinasi
 const searchInput = document.getElementById('searchInput');
 if (searchInput) {
     searchInput.addEventListener('input', function() {
